@@ -44,26 +44,43 @@ def get_spin_result(win_prob):
 		result = True
 	return result
 
-def simulate(win_prob):
+def simulate(win_prob, bankroll = None):
 	winnings = np.array([0])
 	episode_winnings = 0
+	max_bankroll = False
 
 	for i in range(1000):
-		while episode_winnings < 80:
+		while episode_winnings < 80 and max_bankroll is False:
 			won = False
 			bet_amount = 1
+			
 			while won == False:
-				#bet_amount = bet_amount * 2
+
+				if bankroll is not None and bet_amount > bankroll:
+					print('bet is more than bankroll')
+					bet_amount = bankroll
+	
 				won = get_spin_result(win_prob)
 				if won == True:
 					episode_winnings = episode_winnings + bet_amount
 				else:
 					episode_winnings = episode_winnings - bet_amount
 					bet_amount = bet_amount * 2
+
+				if bankroll is not None and episode_winnings <= -bankroll:
+					#print('max bankroll reached')
+					max_bankroll = True
+					break;
+
 				winnings = np.append(winnings, np.array([episode_winnings]))
 
-		winnings = np.append(winnings, np.array([80]))
-	
+		if max_bankroll is True:
+			winnings = np.append(winnings, np.array([-bankroll]))
+		else:
+			winnings = np.append(winnings, np.array([80]))
+
+	#print(winnings)
+	#print(np.min(winnings))
 	return winnings
 
 def test_code():
@@ -89,23 +106,23 @@ def test_code():
 		ax.set_ylim([-256, 100])
 
 	plt.savefig('ML4T_2020Spring/martingale/figure_1.png')
-
+	
 	"""""""""""""""
 	"	Figure 2  "
 	"""""""""""""""
 	fig2, ax2 = plt.subplots(1, 1)
 	fig2.suptitle('Figure 2')
-	mean = np.array([])
-	std = np.array([])
+	mean2 = np.array([])
+	std2 = np.array([])
 	for i in range(1000):
-		sim = simulate(win_prob)
-		mean = np.append(mean, np.array([np.mean(sim)]))
-		std = np.append(std, np.array([np.std(sim)]))
+		sim2 = simulate(win_prob)
+		mean2 = np.append(mean2, np.array([np.mean(sim2)]))
+		std2 = np.append(std2, np.array([np.std(sim2)]))
 
-	xs = range(len(mean))
-	ax2.plot(xs, mean, c='g')
-	ax2.plot(xs, mean+std, c='b')
-	ax2.plot(xs, mean-std, c='b')
+	xs2 = range(len(mean2))
+	ax2.plot(xs2, mean2, c='g')
+	ax2.plot(xs2, mean2+std2, c='b', alpha=0.5)
+	ax2.plot(xs2, mean2-std2, c='b', alpha=0.5)
 	ax2.set_xlabel('Num os Simulations')
 	ax2.set_ylabel('Mean +/- Std')
 	ax2.set_xlim([0, 300])
@@ -117,22 +134,68 @@ def test_code():
 	"""""""""""""""
 	fig3, ax3 = plt.subplots(1, 1)
 	fig3.suptitle('Figure 3')
-	median = np.array([])
-	std = np.array([])
+	median3 = np.array([])
+	std3 = np.array([])
 	for i in range(1000):
-		sim = simulate(win_prob)
-		median = np.append(median, np.array([np.median(sim)]))
-		std = np.append(std, np.array([np.std(sim)]))
+		sim3 = simulate(win_prob)
+		median3 = np.append(median3, np.array([np.median(sim3)]))
+		std3 = np.append(std3, np.array([np.std(sim3)]))
 
-	xs = range(len(median))
-	ax3.plot(xs, median, c='g')
-	ax3.plot(xs, median+std, c='b')
-	ax3.plot(xs, median-std, c='b')
+	xs3 = range(len(median3))
+	ax3.plot(xs3, median3, c='g')
+	ax3.plot(xs3, median3+std3, c='b', alpha=0.5)
+	ax3.plot(xs3, median3-std3, c='b', alpha=0.5)
 	ax3.set_xlabel('Num os Simulations')
 	ax3.set_ylabel('Median +/- Std')
 	ax3.set_xlim([0, 300])
 	ax3.set_ylim([-256, 100])
 	plt.savefig('ML4T_2020Spring/martingale/figure_3.png')
 
+
+	"""""""""""""""
+	"	Figure 4  "
+	"""""""""""""""
+	fig4, ax4 = plt.subplots(1, 1)
+	fig4.suptitle('Figure 4')
+	mean4 = np.array([])
+	std4 = np.array([])
+	for i in range(1000):
+		sim4 = simulate(win_prob, 256)
+		mean4 = np.append(mean4, np.array([np.mean(sim4)]))
+		std4 = np.append(std4, np.array([np.std(sim4)]))
+
+	xs4 = range(len(mean4))
+	ax4.plot(xs4, mean4, c='g')
+	ax4.plot(xs4, mean4+std4, c='b', alpha=0.5)
+	ax4.plot(xs4, mean4-std4, c='b', alpha=0.5)
+	ax4.set_xlabel('Num os Simulations')
+	ax4.set_ylabel('Mean +/- Std')
+	ax4.set_xlim([0, 300])
+	ax4.set_ylim([-256, 100])
+	plt.savefig('ML4T_2020Spring/martingale/figure_4.png')
+	
+	"""""""""""""""
+	"	Figure 5  "
+	"""""""""""""""
+	fig5, ax5 = plt.subplots(1, 1)
+	fig5.suptitle('Figure 5')
+	median5 = np.array([])
+	std5 = np.array([])
+	for i in range(1000):
+		sim5 = simulate(win_prob, 256)
+		median5 = np.append(median5, np.array([np.median(sim5)]))
+		std5 = np.append(std5, np.array([np.std(sim5)]))
+
+	xs5 = range(len(median5))
+	ax5.plot(xs5, median5, c='g')
+	ax5.plot(xs5, median5+std5, c='b', alpha=0.5)
+	ax5.plot(xs5, median5-std5, c='b', alpha=0.5)
+	ax5.set_xlabel('Num os Simulations')
+	ax5.set_ylabel('Median +/- Std')
+	ax5.set_xlim([0, 300])
+	ax5.set_ylim([-256, 100])
+	plt.savefig('ML4T_2020Spring/martingale/figure_5.png')
+
+	
 if __name__ == "__main__":  		  	   		     			  		 			     			  	  		 	  	 		 			  		  			
     test_code()  		  	   		     			  		 			     			  	  		 	  	 		 			  		  			
